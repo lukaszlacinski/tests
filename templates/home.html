@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Sign In with Globus</h1>
+
+  {% if user.is_authenticated %}
+    <p>Signed in as <strong>{{ user.get_username }}</strong>.</p>
+    <a class="btn btn-secondary" href="{% url 'logout' %}">Sign out</a>
+
+    <div class="card">
+      <h2>OAuth2 Token Details</h2>
+      {% if token_data %}
+        <p><strong>Access token:</strong> <code>{{ token_data.access_token }}</code></p>
+        <p><strong>Token type:</strong> {{ token_data.token_type }}</p>
+        <p><strong>Expires in:</strong> {{ token_data.expires_in }}</p>
+        <p><strong>Scope:</strong> {{ token_data.scope }}</p>
+      {% else %}
+        <p>No Globus token data found for this user.</p>
+      {% endif %}
+    </div>
+  {% else %}
+    <p>Authenticate with Globus to view token details.</p>
+    <a class="btn" href="{% url 'social:begin' 'globus' %}">Sign In with Globus</a>
+  {% endif %}
+{% endblock %}
