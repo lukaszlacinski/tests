@@ -6,7 +6,8 @@ from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-load_dotenv(BASE_DIR / ".env")
+# Load local env file if present, without overriding runtime env vars.
+load_dotenv(BASE_DIR / ".env", override=False)
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-secret-key-change-me")
 DEBUG = os.getenv("DEBUG", "True").lower() in {"1", "true", "yes"}
@@ -16,6 +17,9 @@ ALLOWED_HOSTS = [
     for host in os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
     if host.strip()
 ]
+
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -62,10 +66,13 @@ TEMPLATES = [
 WSGI_APPLICATION = "app.wsgi.application"
 ASGI_APPLICATION = "app.asgi.application"
 
+SQLITE_PATH = os.getenv("SQLITE_PATH")
+DB_NAME = SQLITE_PATH if SQLITE_PATH else BASE_DIR / "db.sqlite3"
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "NAME": DB_NAME,
     }
 }
 
@@ -94,7 +101,7 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTHENTICATION_BACKENDS = (
-    "social_core.backends.globus.GlobusOAuth2",
+    "social_core.backends.globus.GlobusOpenIdConnect",
     "django.contrib.auth.backends.ModelBackend",
 )
 

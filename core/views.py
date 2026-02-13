@@ -1,4 +1,5 @@
-from django.shortcuts import render
+from django.contrib.auth import logout
+from django.shortcuts import redirect, render
 
 
 def home(request):
@@ -17,3 +18,8 @@ def home(request):
             token_data = None
 
     return render(request, "home.html", {"token_data": token_data})
+
+
+def logout_view(request):
+    logout(request)
+    return redirect("/")
