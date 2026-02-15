@@ -24,15 +24,15 @@
       "secrets": [
         {
           "name": "DJANGO_SECRET_KEY",
-          "valueFrom": "arn:aws:secretsmanager:us-east-1:${AWS_ACCOUNT_ID}:secret:globusdev/django-secret-key"
+          "valueFrom": "globusdev/django-secret-key"
         },
         {
           "name": "GLOBUS_KEY",
-          "valueFrom": "arn:aws:secretsmanager:us-east-1:${AWS_ACCOUNT_ID}:secret:globusdev/globus-key"
+          "valueFrom": "globusdev/globus-key"
         },
         {
           "name": "GLOBUS_SECRET",
-          "valueFrom": "arn:aws:secretsmanager:us-east-1:${AWS_ACCOUNT_ID}:secret:globusdev/globus-secret"
+          "valueFrom": "globusdev/globus-secret"
         }
       ],
       "logConfiguration": {
