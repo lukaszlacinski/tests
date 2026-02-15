@@ -19,7 +19,7 @@
       ],
       "environment": [
         { "name": "DEBUG", "value": "False" },
-        { "name": "ALLOWED_HOSTS", "value": "app.globusdev.xyz" }
+        { "name": "ALLOWED_HOSTS", "value": "app.globusdev.xyz,app-335444483.us-east-1.elb.amazonaws.com" }
       ],
       "secrets": [
         {
