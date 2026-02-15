@@ -110,3 +110,16 @@ LOGOUT_REDIRECT_URL = "/"
 
 SOCIAL_AUTH_GLOBUS_KEY = os.getenv("GLOBUS_KEY", "")
 SOCIAL_AUTH_GLOBUS_SECRET = os.getenv("GLOBUS_SECRET", "")
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {"console": {"class": "logging.StreamHandler"}},
+    "loggers": {
+        "django.security.DisallowedHost": {
+            "handlers": ["console"],
+            "level": "ERROR",
+            "propagate": False,
+        }
+    },
+}
