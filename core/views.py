@@ -1,5 +1,4 @@
 from django.contrib.auth import logout
-from django.http import JsonResponse
 from django.shortcuts import redirect, render
 
 
@@ -24,7 +23,3 @@ def home(request):
 def logout_view(request):
     logout(request)
     return redirect("/")
-
-
-def health(request):
-    return JsonResponse({"status": "alive"}, status=200)
