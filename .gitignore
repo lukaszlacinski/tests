@@ -14,3 +14,8 @@ data/
 *.swo
 *.egg-info/
 .pytest_cache/
+terraform/.terraform/
+terraform/.terraform.lock.hcl
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
+terraform/*.tfvars

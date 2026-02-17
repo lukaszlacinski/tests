@@ -13,26 +13,26 @@
       "essential": true,
       "portMappings": [
         {
-          "containerPort": 8000,
+          "containerPort": "${ECS_CONTAINER_PORT}",
           "protocol": "tcp"
         }
       ],
       "environment": [
         { "name": "DEBUG", "value": "True" },
-        { "name": "ALLOWED_HOSTS", "value": "app.globusdev.xyz,app-335444483.us-east-1.elb.amazonaws.com" }
+        { "name": "ALLOWED_HOSTS", "value": "app.globusdev.xyz" }
       ],
       "secrets": [
         {
           "name": "DJANGO_SECRET_KEY",
-          "valueFrom": "arn:aws:secretsmanager:us-east-1:164355693859:secret:globusdev/django_secret_key"
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:${AWS_ACCOUNT_ID}:secret:globusdev/django_secret_key"
         },
         {
           "name": "GLOBUS_KEY",
-          "valueFrom": "arn:aws:secretsmanager:us-east-1:164355693859:secret:globusdev/globus_key"
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:${AWS_ACCOUNT_ID}:secret:globusdev/globus_key"
         },
         {
           "name": "GLOBUS_SECRET",
-          "valueFrom": "arn:aws:secretsmanager:us-east-1:164355693859:secret:globusdev/globus_secret"
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:${AWS_ACCOUNT_ID}:secret:globusdev/globus_secret"
         }
       ],
       "logConfiguration": {

@@ -1,13 +1,34 @@
-name: Build and deploy to ECS
+name: Manual build and deploy to ECS
 
 on:
-  push:
-    branches: ["main"]
   workflow_dispatch:
+    inputs:
+      environment:
+        description: "Where to deploy"
+        type: choice
+        required: true
+        options:
+          - staging
+          - prod
+      image_tag:
+        description: "Docker image tag to deploy (e.g. sha, v1.2.3). Leave blank to use latest."
+        type: string
+        required: false
+        default: ""
+      confirm:
+        description: "Type DEPLOY to confirm (recommended for prod)"
+        type: string
+        required: true
+        default: ""
+
+concurrency:
+  group: ecs-staging
+  cancel-in-progress: true
 
 env:
   AWS_REGION: us-east-1
   AWS_ACCOUNT_ID: ${{ vars.AWS_ACCOUNT_ID }}
+  CONTAINER_PORT: ${{ vars.CONTAINER_PORT }}
   ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
   ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}
   ECS_SERVICE: ${{ vars.ECS_SERVICE }}
@@ -20,6 +41,30 @@ jobs:
     permissions:
       contents: read
       id-token: write
+
+    steps:
+      - name: Guardrail
+        run: |
+          if [ "${{ inputs.environment }}" = "prod" ] && [ "${{ inputs.confirm }}" != "DEPLOY" ]; then
+            echo "Refusing: for prod you must type DEPLOY in the confirm field."
+            exit 1
+          fi
+
+      - name: Show chosen inputs
+        run: |
+          echo "env = ${{ inputs.environment }}"
+          echo "tag = ${{ inputs.image_tag }}"
+
+      # Example: pick service/cluster based on dropdown
+      - name: Set env-specific variables
+        run: |
+          if [ "${{ inputs.environment }}" = "staging" ]; then
+            echo "ECS_CLUSTER=globusdev-staging" >> $GITHUB_ENV
+            echo "ECS_SERVICE=globusdev-staging-service" >> $GITHUB_ENV
+          else
+            echo "ECS_CLUSTER=globusdev-prod" >> $GITHUB_ENV
+            echo "ECS_SERVICE=globusdev-prod-service" >> $GITHUB_ENV
+          fi
 
     steps:
       - name: Checkout
@@ -55,11 +100,19 @@ jobs:
       - name: Substitute AWS account id in task definition
         run: envsubst < "${{ env.ECS_TASK_DEFINITION }}" > ecs-task-def.rendered.json
 
+      - name: Set container port in task definition
+        run: >
+          jq
+          --argjson port "${CONTAINER_PORT}"
+          '.containerDefinitions[0].portMappings[0].containerPort = $port'
+          ecs-task-def.rendered.json
+          > ecs-task-def.rendered.port.json
+
       - name: Render new task definition
         id: render-task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: ecs-task-def.rendered.json
+          task-definition: ecs-task-def.rendered.port.json
           container-name: ${{ env.CONTAINER_NAME }}
           image: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
 
