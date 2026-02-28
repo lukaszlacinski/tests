@@ -29,7 +29,7 @@ concurrency:
 env:
   AWS_REGION: us-east-2
   AWS_ACCOUNT_ID: ${{ vars.AWS_ACCOUNT_ID }}
-  APP_NAME: ${{ vars.APP_NAME }}
+  APP_NAME: globus
   ECS_TASK_DEFINITION: ecs-task-def.json
   CONTAINER_NAME: app
 
