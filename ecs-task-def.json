@@ -1,11 +1,11 @@
 {
-  "family": "globusdev-task",
+  "family": "${NAME_PREFIX}-task",
   "networkMode": "awsvpc",
   "requiresCompatibilities": ["FARGATE"],
-  "cpu": "1024",
-  "memory": "2048",
-  "executionRoleArn": "arn:aws:iam::${AWS_ACCOUNT_ID}:role/service-role/ecsTaskExecutionRole",
-  "taskRoleArn": "arn:aws:iam::${AWS_ACCOUNT_ID}:role/service-role/ecsTaskExecutionRole",
+  "cpu": "256",
+  "memory": "512",
+  "executionRoleArn": "arn:aws:iam::${AWS_ACCOUNT_ID}:role/${NAME_PREFIX}-ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::${AWS_ACCOUNT_ID}:role/${NAME_PREFIX}-ecsTaskExecutionRole",
   "containerDefinitions": [
     {
       "name": "app",
@@ -13,33 +13,33 @@
       "essential": true,
       "portMappings": [
         {
-          "containerPort": "${ECS_CONTAINER_PORT}",
+          "containerPort": 8000,
           "protocol": "tcp"
         }
       ],
       "environment": [
-        { "name": "DEBUG", "value": "True" },
-        { "name": "ALLOWED_HOSTS", "value": "app.globusdev.xyz" }
+        { "name": "DEBUG", "value": "False" },
+        { "name": "ALLOWED_HOSTS", "value": "apptf.globusdev.xyz" }
       ],
       "secrets": [
         {
           "name": "DJANGO_SECRET_KEY",
-          "valueFrom": "arn:aws:secretsmanager:us-east-1:${AWS_ACCOUNT_ID}:secret:globusdev/django_secret_key"
+          "valueFrom": "arn:aws:secretsmanager:${AWS_REGION}:${AWS_ACCOUNT_ID}:secret:globusdev/django_secret_key"
         },
         {
           "name": "GLOBUS_KEY",
-          "valueFrom": "arn:aws:secretsmanager:us-east-1:${AWS_ACCOUNT_ID}:secret:globusdev/globus_key"
+          "valueFrom": "arn:aws:secretsmanager:${AWS_REGION}:${AWS_ACCOUNT_ID}:secret:globusdev/globus_key"
         },
         {
           "name": "GLOBUS_SECRET",
-          "valueFrom": "arn:aws:secretsmanager:us-east-1:${AWS_ACCOUNT_ID}:secret:globusdev/globus_secret"
+          "valueFrom": "arn:aws:secretsmanager:${AWS_REGION}:${AWS_ACCOUNT_ID}:secret:globusdev/globus_secret"
         }
       ],
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "/ecs/globusdev-app",
-          "awslogs-region": "us-east-1",
+          "awslogs-group": "/ecs/${NAME_PREFIX}",
+          "awslogs-region": "${AWS_REGION}",
           "awslogs-stream-prefix": "app"
         }
       }

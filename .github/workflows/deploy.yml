@@ -26,12 +26,9 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  AWS_REGION: us-east-1
+  AWS_REGION: us-east-2
   AWS_ACCOUNT_ID: ${{ vars.AWS_ACCOUNT_ID }}
-  CONTAINER_PORT: ${{ vars.CONTAINER_PORT }}
-  ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
-  ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}
-  ECS_SERVICE: ${{ vars.ECS_SERVICE }}
+  APP_NAME: ${{ vars.APP_NAME }}
   ECS_TASK_DEFINITION: ecs-task-def.json
   CONTAINER_NAME: app
 
@@ -43,6 +40,9 @@ jobs:
       id-token: write
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Guardrail
         run: |
           if [ "${{ inputs.environment }}" = "prod" ] && [ "${{ inputs.confirm }}" != "DEPLOY" ]; then
@@ -55,20 +55,13 @@ jobs:
           echo "env = ${{ inputs.environment }}"
           echo "tag = ${{ inputs.image_tag }}"
 
-      # Example: pick service/cluster based on dropdown
       - name: Set env-specific variables
         run: |
-          if [ "${{ inputs.environment }}" = "staging" ]; then
-            echo "ECS_CLUSTER=globusdev-staging" >> $GITHUB_ENV
-            echo "ECS_SERVICE=globusdev-staging-service" >> $GITHUB_ENV
-          else
-            echo "ECS_CLUSTER=globusdev-prod" >> $GITHUB_ENV
-            echo "ECS_SERVICE=globusdev-prod-service" >> $GITHUB_ENV
-          fi
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+          NAME_PREFIX="${APP_NAME}-${{ inputs.environment }}"
+          echo "NAME_PREFIX=${NAME_PREFIX}" >> $GITHUB_ENV
+          echo "ECR_REPOSITORY=${NAME_PREFIX}-app" >> $GITHUB_ENV
+          echo "ECS_CLUSTER=${NAME_PREFIX}-cluster" >> $GITHUB_ENV
+          echo "ECS_SERVICE=${NAME_PREFIX}-service" >> $GITHUB_ENV
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -100,19 +93,11 @@ jobs:
       - name: Substitute AWS account id in task definition
         run: envsubst < "${{ env.ECS_TASK_DEFINITION }}" > ecs-task-def.rendered.json
 
-      - name: Set container port in task definition
-        run: >
-          jq
-          --argjson port "${CONTAINER_PORT}"
-          '.containerDefinitions[0].portMappings[0].containerPort = $port'
-          ecs-task-def.rendered.json
-          > ecs-task-def.rendered.port.json
-
       - name: Render new task definition
         id: render-task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: ecs-task-def.rendered.port.json
+          task-definition: ecs-task-def.rendered.json
           container-name: ${{ env.CONTAINER_NAME }}
           image: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
 

@@ -1,5 +1,5 @@
 resource "aws_iam_role" "ecs_task_execution" {
-  name = "${var.app_name}-ecsTaskExecutionRole"
+  name = "${local.name_prefix}-ecsTaskExecutionRole"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -22,7 +22,7 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_policy" {
 
 resource "aws_iam_role_policy" "ecs_task_execution_secrets" {
   count = length(var.secret_arns) > 0 ? 1 : 0
-  name  = "${var.app_name}-ecsTaskExecutionSecrets"
+  name  = "${local.name_prefix}-ecsTaskExecutionSecrets"
   role  = aws_iam_role.ecs_task_execution.id
 
   policy = jsonencode({
