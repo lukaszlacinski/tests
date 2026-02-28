@@ -13,6 +13,8 @@ data "aws_subnets" "default" {
   }
 }
 
+data "aws_caller_identity" "current" {}
+
 locals {
   vpc_id            = coalesce(var.vpc_id, data.aws_vpc.default.id)
   public_subnet_ids = coalescelist(var.public_subnet_ids, data.aws_subnets.default.ids)

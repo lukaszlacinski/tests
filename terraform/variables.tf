@@ -99,6 +99,12 @@ variable "secret_arns" {
   default     = []
 }
 
+variable "secret_prefix" {
+  type        = string
+  description = "Secrets Manager name prefix (e.g., globusdev/) for GetSecretValue access"
+  default     = "globusdev/"
+}
+
 variable "acm_certificate_arn" {
   type        = string
   description = "ACM certificate ARN in us-east-1 for CloudFront (required when using a custom domain)"

@@ -75,7 +75,7 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build, tag, and push image
+      - name: Build and tag image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
@@ -83,13 +83,16 @@ jobs:
           docker build
           --platform linux/amd64
           -t "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          -t "$ECR_REGISTRY/$ECR_REPOSITORY:latest"
           .
 
       - name: Push image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
-        run: docker push "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+        run: |
+          docker push "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          docker push "$ECR_REGISTRY/$ECR_REPOSITORY:latest"
 
       - name: Substitute AWS account id in task definition
         run: envsubst < "${{ env.ECS_TASK_DEFINITION }}" > ecs-task-def.rendered.json

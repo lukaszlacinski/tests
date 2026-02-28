@@ -21,17 +21,18 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_policy" {
 }
 
 resource "aws_iam_role_policy" "ecs_task_execution_secrets" {
-  count = length(var.secret_arns) > 0 ? 1 : 0
-  name  = "${local.name_prefix}-ecsTaskExecutionSecrets"
-  role  = aws_iam_role.ecs_task_execution.id
+  name = "${local.name_prefix}-ecsTaskExecutionSecrets"
+  role = aws_iam_role.ecs_task_execution.id
 
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
-        Effect   = "Allow"
-        Action   = ["secretsmanager:GetSecretValue"]
-        Resource = var.secret_arns
+        Effect = "Allow"
+        Action = ["secretsmanager:GetSecretValue"]
+        Resource = length(var.secret_arns) > 0 ? var.secret_arns : [
+          "arn:aws:secretsmanager:${var.aws_region}:${data.aws_caller_identity.current.account_id}:secret:${var.secret_prefix}*"
+        ]
       }
     ]
   })
