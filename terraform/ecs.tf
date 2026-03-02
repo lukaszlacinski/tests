@@ -2,6 +2,15 @@ resource "aws_ecs_cluster" "app" {
   name = "${local.name_prefix}-cluster"
 }
 
+locals {
+  container_secrets = [
+    for name in var.secret_names : {
+      name      = upper(replace(name, "_", "_"))
+      valueFrom = "arn:aws:secretsmanager:${var.aws_region}:${data.aws_caller_identity.current.account_id}:secret:${var.secret_prefix}${name}"
+    }
+  ]
+}
+
 resource "aws_ecs_task_definition" "app" {
   family                   = "${local.name_prefix}-task"
   network_mode             = "awsvpc"
@@ -26,6 +35,7 @@ resource "aws_ecs_task_definition" "app" {
         { name = "DEBUG", value = var.debug },
         { name = "ALLOWED_HOSTS", value = var.allowed_hosts }
       ]
+      secrets = local.container_secrets
       logConfiguration = {
         logDriver = "awslogs"
         options = {

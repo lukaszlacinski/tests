@@ -111,6 +111,12 @@ variable "secret_prefix" {
   default     = "globusdev/"
 }
 
+variable "secret_names" {
+  type        = list(string)
+  description = "Secrets Manager secret names (without prefix)"
+  default     = ["django_secret_key", "globus_key", "globus_secret"]
+}
+
 variable "acm_certificate_arn" {
   type        = string
   description = "ACM certificate ARN in us-east-1 for CloudFront (required when using a custom domain)"
