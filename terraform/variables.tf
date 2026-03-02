@@ -45,6 +45,12 @@ variable "desired_count" {
   default     = 1
 }
 
+variable "image_tag" {
+  type        = string
+  description = "Docker image tag for the ECS task definition"
+  default     = "latest"
+}
+
 variable "task_cpu" {
   type        = number
   description = "Fargate task CPU units"

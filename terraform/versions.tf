@@ -11,4 +11,12 @@ terraform {
       version = ">= 4.0.0"
     }
   }
+
+  backend "s3" {
+    bucket       = "globus-dev-tfstate"
+    key          = "terraform/terraform.tfstate"
+    region       = "us-east-2"
+    encrypt      = true
+    use_lockfile = true
+  }
 }
