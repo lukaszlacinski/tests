@@ -96,7 +96,8 @@ jobs:
       - name: Terraform init
         run: |
           cd terraform
-          tofu init -input=false
+          tofu init -reconfigure -input=false \
+            -backend-config=backend-${{ inputs.environment }}.hcl
 
       - name: Terraform apply (update task definition)
         env:

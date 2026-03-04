@@ -2,22 +2,6 @@ data "aws_iam_openid_connect_provider" "github" {
   url = "https://token.actions.githubusercontent.com"
 }
 
-data "tls_certificate" "github_actions" {
-  count = var.create_github_oidc_provider ? 1 : 0
-  url   = "https://token.actions.githubusercontent.com"
-}
-
-resource "aws_iam_openid_connect_provider" "github" {
-  count           = var.create_github_oidc_provider ? 1 : 0
-  url             = "https://token.actions.githubusercontent.com"
-  client_id_list  = ["sts.amazonaws.com"]
-  thumbprint_list = [data.tls_certificate.github_actions[0].certificates[0].sha1_fingerprint]
-}
-
-locals {
-  github_oidc_provider_arn = var.create_github_oidc_provider ? aws_iam_openid_connect_provider.github[0].arn : data.aws_iam_openid_connect_provider.github.arn
-}
-
 resource "aws_iam_role" "github_actions" {
   name = "${local.name_prefix}-github-actions"
 
@@ -27,7 +11,7 @@ resource "aws_iam_role" "github_actions" {
       {
         Effect = "Allow"
         Principal = {
-          Federated = local.github_oidc_provider_arn
+          Federated = data.aws_iam_openid_connect_provider.github.arn
         }
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {

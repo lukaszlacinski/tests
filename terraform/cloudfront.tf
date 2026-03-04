@@ -39,12 +39,12 @@ resource "aws_cloudfront_distribution" "app" {
     }
   }
 
-  aliases = var.app_domain_name != null ? [var.app_domain_name] : []
+  aliases = local.domain_name != null ? [local.domain_name] : []
 
   viewer_certificate {
-    acm_certificate_arn            = var.app_domain_name != null ? var.acm_certificate_arn : null
-    ssl_support_method             = var.app_domain_name != null ? "sni-only" : null
+    acm_certificate_arn            = local.domain_name != null ? var.acm_certificate_arn : null
+    ssl_support_method             = local.domain_name != null ? "sni-only" : null
     minimum_protocol_version       = "TLSv1.2_2021"
-    cloudfront_default_certificate = var.app_domain_name == null
+    cloudfront_default_certificate = local.domain_name == null
   }
 }

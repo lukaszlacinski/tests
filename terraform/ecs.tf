@@ -33,7 +33,7 @@ resource "aws_ecs_task_definition" "app" {
       ]
       environment = [
         { name = "DEBUG", value = var.debug },
-        { name = "ALLOWED_HOSTS", value = var.allowed_hosts }
+        { name = "ALLOWED_HOSTS", value = local.domain_name }
       ]
       secrets = local.container_secrets
       logConfiguration = {

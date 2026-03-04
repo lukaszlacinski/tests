@@ -81,15 +81,9 @@ variable "route53_zone_id" {
   default     = null
 }
 
-variable "app_domain_name" {
+variable "domain_name" {
   type        = string
   description = "DNS name for the app (optional)"
-  default     = null
-}
-
-variable "allowed_hosts" {
-  type        = string
-  description = "ALLOWED_HOSTS value for Django"
   default     = null
 }
 
@@ -133,10 +127,4 @@ variable "github_branch" {
   type        = string
   description = "GitHub branch allowed to assume the role"
   default     = "main"
-}
-
-variable "create_github_oidc_provider" {
-  type        = bool
-  description = "Create the GitHub OIDC provider (set false if it already exists)"
-  default     = false
 }

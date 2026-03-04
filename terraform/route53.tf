@@ -1,7 +1,7 @@
 resource "aws_route53_record" "app" {
-  count   = var.route53_zone_id != null && var.app_domain_name != null ? 1 : 0
+  count   = var.route53_zone_id != null && local.domain_name != null ? 1 : 0
   zone_id = var.route53_zone_id
-  name    = var.app_domain_name
+  name    = local.domain_name
   type    = "A"
 
   alias {

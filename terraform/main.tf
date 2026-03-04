@@ -20,4 +20,5 @@ locals {
   public_subnet_ids = coalescelist(var.public_subnet_ids, data.aws_subnets.default.ids)
   name_prefix       = length(trimspace(var.name_prefix)) > 0 ? var.name_prefix : "${var.app_name}-${var.environment}"
   log_group_name    = "/ecs/${local.name_prefix}"
+  domain_name       = var.domain_name != null ? (var.environment == "prod" ? var.domain_name : "${var.environment}.${var.domain_name}") : null
 }
