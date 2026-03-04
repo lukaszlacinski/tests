@@ -78,13 +78,13 @@ variable "public_subnet_ids" {
 variable "route53_zone_id" {
   type        = string
   description = "Route53 hosted zone ID for app DNS (optional)"
-  default     = null
+  default     = "Z076792727LE0PF3E7KE8"
 }
 
 variable "domain_name" {
   type        = string
   description = "DNS name for the app (optional)"
-  default     = null
+  default     = "apptf.globusdev.xyz"
 }
 
 variable "debug" {
@@ -114,7 +114,7 @@ variable "secret_names" {
 variable "acm_certificate_arn" {
   type        = string
   description = "ACM certificate ARN in us-east-1 for CloudFront (required when using a custom domain)"
-  default     = null
+  default     = "arn:aws:acm:us-east-1:164355693859:certificate/9a9dc2d4-dbce-4d53-926c-165de5355a13"
 }
 
 variable "github_repo" {
